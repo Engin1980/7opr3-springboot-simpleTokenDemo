@@ -1,0 +1,63 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor User
+participant BackEnd as be
+participant UserController as uc
+participant TokenManager as tm
+database UserRepository as ur
+
+== Přihlášení ==
+
+User -> be: login (name, password)
+activate be
+be -> uc : login (name, password)
+deactivate be
+activate uc
+uc -> ur : getUser(name)
+activate ur
+ur --> uc : (dbUser)
+deactivate ur
+uc -> uc : zkontroluj správnost přihlášení(name,password, dbUser)
+uc -> tm : zaregistruj nový token(dbUser)
+activate tm
+tm --> uc : token
+deactivate tm
+uc -> User : HTTP 200 OK + token
+deactivate uc
+
+== Ověření ==
+autonumber 1
+User -> be: doSomething(data) + token
+activate be
+be -> tm : ifTokenValidGetUser(token)
+activate tm
+tm --> be : dbUser nebo null
+deactivate tm
+alt Nevalidní token
+be -> User : HTTP 401 Unauthorized
+note right: Vrácení chyby uživateli, dále se nepokračuje
+else Validní token
+be -> uc: doSomething(data)
+deactivate be
+activate uc
+uc -> User: HTTP 200 Ok
+deactivate uc
+end
+
+== Odhlášení ==
+autonumber 1
+User -> be: logout() + token
+activate be
+be -> uc : logout() + token
+activate uc
+deactivate be
+uc -> tm : zruš platnost tokenu (token)
+activate tm
+tm --> uc
+deactivate tm
+uc -> User: HTTP 200 Ok
+
+@enduml

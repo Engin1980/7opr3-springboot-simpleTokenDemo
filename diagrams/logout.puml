@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor User as u
+participant "SpringBoot\nSecurity" as ss
+participant UserController as uc
+participant TokenManager as tm
+participant AppUserRepository as r
+
+u -> ss : /user/logout + token
+activate ss
+ss -> uc : /user/logout + token
+deactivate ss
+activate uc
+uc -> tm : forgotToken(token)
+activate tm
+tm --> uc :
+deactivate tm
+uc -> u : HTTP 200 - Ok
+deactivate uc
+
+@enduml

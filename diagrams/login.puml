@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor User as u
+participant "SpringBoot\nSecurity" as ss
+participant UserController as uc
+participant TokenManager as tm
+participant AppUserRepository as r
+
+u -> ss : login(username, password)
+activate ss
+ss -> uc : login(username, password)
+deactivate ss
+activate uc
+uc -> r : get(username)
+activate r
+uc <-- r : appUser
+deactivate r
+uc -> uc : kontrola hesla\n(appUser vs. password)
+uc -> tm : createTokenFor(appUser)
+activate tm
+uc <-- tm : token
+deactivate tm
+uc -> u : token
+deactivate uc
+
+@enduml

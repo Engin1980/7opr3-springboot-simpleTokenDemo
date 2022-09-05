@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor User as u
+participant "SpringBoot\nSecurity" as ss
+participant UserController as uc
+participant TokenManager as tm
+participant AppUserRepository as r
+
+u -> ss : /user/list + token
+activate ss
+ss -> tm : getValidatedUserByToken(token)
+activate tm
+tm --> ss : Optional<AppUser>
+deactivate tm
+ss -> uc : /user/list
+deactivate ss
+activate uc
+uc -> r : getAllUsers()
+activate r
+r --> uc : List<AppUser>
+deactivate r
+uc -> u : list of users
+deactivate uc
+
+
+@enduml
